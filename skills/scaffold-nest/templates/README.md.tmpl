@@ -1,0 +1,73 @@
+# __APP_NAME__
+
+NestJS backend, scaffolded by the `scaffold-nest` skill. SWC builder, oxlint, Postgres (TypeORM) + Redis via docker-compose, universal exception filter, CORS, multi-env `.env`, smoke tests via `@vendidit/test-tools`.
+
+## Run
+
+Preferred dev loop: services in Docker, app native.
+
+```bash
+pnpm install
+make docker-services     # postgres + redis in background
+pnpm start:dev           # http://localhost:3000  (watch mode)
+```
+
+Full Docker (when you don't want Node locally):
+
+```bash
+make docker-start        # api + postgres + redis, all in containers
+make docker-stop
+```
+
+`make help` lists every target.
+
+## Common commands
+
+```bash
+pnpm build               # dist/
+pnpm start:prod          # node dist/main
+pnpm typecheck           # tsc --noEmit
+pnpm lint                # oxlint
+pnpm test                # jest
+pnpm test:smoke          # smoke suite only
+
+# migrations (TypeORM 0.3 CLI)
+pnpm migration:generate src/database/migrations/<Name>
+pnpm migration:run
+pnpm migration:revert
+pnpm migration:show
+```
+
+Envs: `.env` (dev), `.env.staging`, `.env.production`. Use `pnpm start:stage` to run against `.env.staging`, `NODE_ENV=production node dist/main` for prod.
+
+## Layout
+
+- `src/` — application code. Features go in `src/modules/<name>/` (controller, service, entity, dto).
+- `src/common/` — filters, interceptors, constants, shared DTOs — cross-cutting.
+- `src/config/` — `@nestjs/config` loaders + Joi env validation.
+- `src/database/` — TypeORM module + migrations + CLI `data-source.ts`.
+- `src/cache/` — Redis provider (`REDIS_CLIENT`).
+- `src/health/` — liveness + readiness endpoints.
+- `config/` — all tool configs (nest-cli, tsconfig, .swcrc, oxlint, Dockerfile, jest).
+- `tests/` — `tests/specs/*.spec.ts` via `@vendidit/test-tools`.
+
+## Conventions
+
+- **Never `process.env.FOO` directly.** Go through `configService.get('namespace.key')`. Env is Joi-validated at boot; malformed env fails fast.
+- **All responses go through `ResponseInterceptor`** (success → `{ data, timestamp }`) and `AllExceptionsFilter` (error → `{ error: { code, message, details?, timestamp, path } }`). Don't hand-roll response shapes.
+- **4-space indentation.**
+- **Controller routes + service methods** get a brief comment on what they do. Non-obvious logic gets an inline comment with the *why*.
+- **CORS** defaults to `*`. Lock down via `CORS_ORIGINS` (comma-separated) when you know the consumer domains.
+
+## Admin tips
+
+- Boot diagnostics: every startup logs registered controllers, validated config keys, and DB/Redis connection status. If something's off at boot, it's there.
+- `GET /health` — liveness (always 200 if the app is running). `GET /health/ready` — readiness (checks DB + Redis).
+- Nest's built-in `Logger` is used by default. Swap to `nestjs-pino` for structured logs when you need them — `LoggingInterceptor` will keep working.
+- Migration workflow: change an entity, `pnpm migration:generate src/database/migrations/<DescriptiveName>`, commit, `pnpm migration:run`.
+- `DB_SYNCHRONIZE=true` is only honored in `NODE_ENV=development`. Never in staging/prod — use migrations.
+
+## Docker notes
+
+- `config/Dockerfile` is multi-stage (deps → build → runtime). Runs `node dist/main` on :3000 behind the default `NODE_ENV=production`.
+- `.dockerignore` must live at the project root per Docker's build-context rules — one of the few configs that can't go in `config/`.

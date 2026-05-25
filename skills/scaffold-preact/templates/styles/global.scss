@@ -1,0 +1,27 @@
+// Single entry for global styles. Component-scoped styles live next to
+// their component as *.module.scss.
+
+@use 'variables';
+@use 'themes';
+@use 'reset';
+
+// Forward mixins + responsive so component SCSS can `@use '@styles/mixins' as *;`
+@forward 'mixins';
+@forward 'responsive';
+
+body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    transition: background var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out);
+}
+
+a {
+    color: var(--color-primary);
+    &:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+}

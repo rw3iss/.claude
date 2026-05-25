@@ -1,0 +1,67 @@
+{
+    "name": "__APP_NAME__",
+    "private": true,
+    "version": "0.1.0",
+    "description": "__APP_NAME__ — NestJS backend",
+    "scripts": {
+        "build": "nest build -c config/nest-cli.json",
+        "start": "nest start -c config/nest-cli.json",
+        "start:dev": "nest start -c config/nest-cli.json --watch",
+        "start:debug": "nest start -c config/nest-cli.json --debug --watch",
+        "start:prod": "node dist/main",
+        "start:stage": "dotenv -e .env.staging -- nest start -c config/nest-cli.json",
+        "typecheck": "tsc --noEmit -p config/tsconfig.json",
+        "lint": "oxlint --config config/oxlint.json src",
+        "test": "jest --config config/jest.config.js",
+        "test:watch": "jest --config config/jest.config.js --watch",
+        "test:smoke": "jest --config config/jest.config.js tests/specs/smoke",
+        "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
+        "migration:run": "pnpm typeorm migration:run",
+        "migration:revert": "pnpm typeorm migration:revert",
+        "migration:generate": "pnpm typeorm migration:generate",
+        "migration:show": "pnpm typeorm migration:show"
+    },
+    "dependencies": {
+        "@nestjs/common": "^11.1.19",
+        "@nestjs/config": "^4.0.4",
+        "@nestjs/core": "^11.1.19",
+        "@nestjs/platform-express": "^11.1.19",
+        "@nestjs/typeorm": "^11.0.1",
+        "class-transformer": "^0.5.1",
+        "class-validator": "^0.15.1",
+        "dotenv": "^16.4.7",
+        "express": "^5.1.0",
+        "ioredis": "^5.10.1",
+        "joi": "^18.1.2",
+        "pg": "^8.20.0",
+        "reflect-metadata": "^0.2.2",
+        "rxjs": "^7.8.1",
+        "typeorm": "^0.3.28"
+    },
+    "devDependencies": {
+        "@nestjs/cli": "^11.0.21",
+        "@nestjs/schematics": "^11.0.2",
+        "@nestjs/testing": "^11.1.19",
+        "@swc/cli": "^0.6.0",
+        "@swc/core": "^1.15.30",
+        "@types/express": "^5.0.0",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.10.0",
+        "@types/supertest": "^6.0.2",
+        "@vendidit/test-tools": "github:Vendidit/tools#path:packages/test-tools",
+        "dotenv-cli": "^8.0.0",
+        "jest": "^30.0.0",
+        "oxlint": "^1.61.0",
+        "supertest": "^7.0.0",
+        "ts-jest": "^29.2.5",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@nestjs/core",
+            "@swc/core",
+            "@vendidit/test-tools"
+        ]
+    }
+}

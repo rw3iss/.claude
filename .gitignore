@@ -1,0 +1,30 @@
+# Allowlist-only repo for ~/.claude.
+#
+# Default-deny everything; re-include only what's explicitly tracked.
+# This protects credentials, session history, telemetry, project state,
+# and other Claude-runtime data from ever being committed by accident.
+#
+# To add a new file/dir to the repo, add a `!` rule below.
+
+# 1. Ignore every root-level entry by default.
+/*
+
+# 2. Re-include this .gitignore itself.
+!/.gitignore
+
+# 3. Re-include the top-level dirs we want tracked.
+!/agents/
+!/commands/
+!/scripts/
+!/skills/
+
+# 4. Inside skills/, default-deny again, then re-include the chosen skills.
+/skills/*
+!/skills/api-sync/
+!/skills/mvp-analysis/
+!/skills/scaffold-nest/
+!/skills/scaffold-preact/
+!/skills/system-fix/
+
+# 5. Never commit node_modules from anywhere (incl. inside tracked skills).
+node_modules/
