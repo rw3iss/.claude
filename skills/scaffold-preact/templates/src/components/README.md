@@ -5,8 +5,8 @@ Reusable presentational components. Each component gets its own folder:
 ```
 components/
 └── Button/
-    ├── Button.tsx
-    ├── Button.module.scss
+    ├── Button.tsx        # imports './Button.scss' once; uses class="button"
+    ├── Button.scss       # traditional SCSS, real class names (no CSS modules)
     └── index.ts
 ```
 

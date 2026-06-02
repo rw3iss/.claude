@@ -1,16 +1,9 @@
-// SCSS / CSS module type declarations. Each import returns a
-// hashed-class-name map keyed by the original class names in the file.
+// Style import type declarations.
+//
+// Component styles are authored as traditional SCSS (one .scss file per
+// component, imported once at the top of the component for its side effect),
+// using normal hierarchical selectors and real class names — NOT CSS modules.
+// So a style import carries no value; it just registers the stylesheet.
 
-declare module '*.module.scss' {
-    const classes: { readonly [key: string]: string };
-    export default classes;
-}
-
-declare module '*.module.css' {
-    const classes: { readonly [key: string]: string };
-    export default classes;
-}
-
-// Plain .scss/.css imports (side-effect imports like global.scss)
 declare module '*.scss';
 declare module '*.css';

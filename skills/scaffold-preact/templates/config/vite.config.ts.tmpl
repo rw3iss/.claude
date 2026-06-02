@@ -7,28 +7,28 @@ import path from 'node:path';
 const root = fileURLToPath(new URL('..', import.meta.url));
 
 export default defineConfig({
-    root,
-    plugins: [preact()],
-    resolve: {
-        alias: {
-            '@': path.resolve(root, 'src'),
-            '@styles': path.resolve(root, 'styles'),
-        },
-    },
-    css: {
-        preprocessorOptions: {
-            scss: {
-                api: 'modern-compiler',
-            },
-        },
-    },
-    server: {
-        port: 5173,
-        open: true,
-    },
-    build: {
-        outDir: 'dist',
-        sourcemap: true,
-        target: 'es2022',
-    },
+	root,
+	plugins: [preact()],
+	resolve: {
+		alias: {
+			'@': path.resolve(root, 'src'),
+			'@styles': path.resolve(root, 'styles'),
+		},
+	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				api: 'modern-compiler',
+			},
+		},
+	},
+	server: {
+		port: 5173,
+		open: true,
+	},
+	build: {
+		outDir: 'dist',
+		sourcemap: true,
+		target: 'es2022',
+	},
 });

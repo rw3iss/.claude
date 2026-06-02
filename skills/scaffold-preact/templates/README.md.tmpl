@@ -26,7 +26,7 @@ pnpm typecheck  # tsc --noEmit
 - **Components** are presentational and composable. State lives in hooks.
 - **`lib/`** is pure — no Preact imports. Put utilities, formatters, parsers here.
 - **`services/`** is side-effectful — API clients, storage, service workers.
-- **Styling**: SCSS modules (`Component.module.scss`) for component-scoped styles; global design tokens in `styles/_variables.scss` as CSS custom properties. Use inline `style={{...}}` only for values computed from runtime state (e.g., a transform driven by mouse position).
+- **Styling**: traditional SCSS — one `Component.scss` per component, imported once at the top of the component (`import './Component.scss';`) and referenced with real class names (`class="card"`). Hierarchical/nested selectors, no CSS modules, no CSS-in-JS. Global design tokens live in `styles/_variables.scss` as CSS custom properties. Use inline `style={{...}}` only for values computed from runtime state (e.g., a transform driven by mouse position).
 - **Theming**: swap themes by setting `document.documentElement.dataset.theme = 'dark'`. Overrides live in `styles/_themes.scss`.
 
 ## Bundler

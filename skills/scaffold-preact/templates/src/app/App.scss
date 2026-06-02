@@ -1,0 +1,29 @@
+// Component styles — traditional SCSS, imported once at the top of App.tsx.
+// Use real, hierarchical class names here and `class="app"` in the markup
+// (no CSS modules, no hashed-classname JS import).
+@use '@styles/mixins' as *;
+
+.app {
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-4);
+	text-align: center;
+
+	h1 {
+		font-size: fluid(28px, 56px);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+
+	code {
+		background: var(--color-surface);
+		padding: 0.1em 0.4em;
+		border-radius: 4px;
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+	}
+}

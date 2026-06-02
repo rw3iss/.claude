@@ -5,8 +5,8 @@ Route-level view components. One folder per page:
 ```
 pages/
 ├── Home/
-│   ├── Home.tsx
-│   ├── Home.module.scss
+│   ├── Home.tsx          # imports './Home.scss' once; uses real class names
+│   ├── Home.scss         # traditional SCSS (no CSS modules)
 │   └── index.ts
 └── About/
     └── ...
