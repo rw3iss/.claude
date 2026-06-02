@@ -15,7 +15,11 @@ pnpm typecheck  # tsc --noEmit
 
 ## Layout
 
-- `src/` — app code (`app/`, `components/`, `pages/`, `hooks/`, `lib/`, `services/`, `types/`)
+- `src/` — app code:
+  - `pages/<PageName>/` — page-level / route views (one folder per page)
+  - `components/<feature-or-component>/` — feature & UI components (one folder each)
+  - `components/common/<Component>/` — primitive / core shared components (Button, Input, Modal, …)
+  - `app/`, `hooks/`, `lib/`, `services/`, `types/`
 - `styles/` — global SCSS (variables, mixins, responsive, reset, themes)
 - `config/` — all tool configs (vite, tsconfig, oxlint, Dockerfile)
 - `public/` — static assets served as-is
@@ -23,6 +27,7 @@ pnpm typecheck  # tsc --noEmit
 
 ## Conventions
 
+- **Placement** — keep pages and components separate: a **page** (route/screen) goes in `src/pages/<PageName>/`; a **feature/UI component** in `src/components/<feature-or-component>/`; a **primitive/core "common" component** (Button, Input, Modal, …) in `src/components/common/<Component>/`. Don't dump everything flat into `components/`.
 - **Components** are presentational and composable. State lives in hooks.
 - **`lib/`** is pure — no Preact imports. Put utilities, formatters, parsers here.
 - **`services/`** is side-effectful — API clients, storage, service workers.
