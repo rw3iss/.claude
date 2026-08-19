@@ -1,6 +1,6 @@
-# Generate design images via the designer skill
+# Generate design images via the design skill
 
-Evoke the **designer** skill to generate application-style design images
+Evoke the **design** skill to generate application-style design images
 (Midjourney, through your own Discord bot) from a natural-language brief. Output
 lands under `./designs/<request-name>/images/`.
 
@@ -15,10 +15,10 @@ lands under `./designs/<request-name>/images/`.
 2. **If no brief was given** — Print
    `usage: /design <brief>   e.g. /design a luxury watch PDP, cream + champagne gold, editorial serif`
    and stop.
-3. **Invoke the skill** — Use the Skill tool with `skill: "designer"`, passing the
+3. **Invoke the skill** — Use the Skill tool with `skill: "design"`, passing the
    brief through. Let the skill walk up from the current directory for a
    `DESIGN.md` and merge those project rules; honor any extra flags the user
    included (aspect ratio, "no gradients", etc.).
-4. **Follow the skill exactly** — Do what `designer/SKILL.md` dictates (prepare
+4. **Follow the skill exactly** — Do what `design/SKILL.md` dictates (prepare
    prompt → trigger Midjourney → split the grid → save variants). Don't
    reimplement the workflow here.

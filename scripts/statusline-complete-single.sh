@@ -108,7 +108,7 @@ get_git_info() {
     local needs_refresh=true
     if [ -f "$cache_file" ]; then
         local mtime now age
-        mtime=$(stat -f %m "$cache_file" 2>/dev/null || stat -c %Y "$cache_file" 2>/dev/null)
+        mtime=$(stat -c %Y "$cache_file" 2>/dev/null || stat -f %m "$cache_file" 2>/dev/null)
         now=$(date +%s)
         age=$(( now - mtime ))
         [ "$age" -lt "$GIT_CACHE_SECS" ] && needs_refresh=false
@@ -258,6 +258,7 @@ format_reset_time() {
 model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 cwd=$(echo "$input"        | jq -r '.cwd // empty')
 cost_usd=$(echo "$input"   | jq -r '.cost.total_cost_usd // empty')
+effort_level=$(echo "$input" | jq -r '.effort.level // empty')
 
 size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 [ "$size" -eq 0 ] 2>/dev/null && size=200000
@@ -332,6 +333,24 @@ display_model="$model_name"
 [ "$width_tier" = "narrow" ] && display_model=$(short_model "$model_name")
 out+="${model_color}${display_model}${reset}"
 
+# Effort level — column right after the model name, color-coded by intensity
+# (dim → green → amber → orange → red). Sourced from .effort.level in the
+# statusline JSON (values: low / medium / high / xhigh / max).
+if [ -n "$effort_level" ]; then
+    case "$effort_level" in
+        low)    effort_color="$dim"    ;;
+        medium) effort_color="$green"  ;;
+        high)   effort_color="$amber"  ;;
+        xhigh)  effort_color="$orange" ;;
+        max)    effort_color="$red"    ;;
+        *)      effort_color="$cyan"   ;;
+    esac
+    if [ "$width_tier" = "narrow" ]; then
+        out+="${sep}${effort_color}⚡${effort_level}${reset}"
+    else
+        out+="${sep}${effort_color}⚡ ${effort_level}${reset}"
+    fi
+fi
 
 # Git branch + dirty + ahead/behind
 if $SHOW_GIT && [ -n "$cwd" ]; then
