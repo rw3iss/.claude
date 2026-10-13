@@ -10,7 +10,7 @@ import { REDIS_CLIENT, redisProvider } from './redis.provider';
  */
 @Global()
 @Module({
-    providers: [redisProvider],
-    exports: [REDIS_CLIENT],
+	providers: [redisProvider],
+	exports: [REDIS_CLIENT],
 })
 export class CacheModule {}

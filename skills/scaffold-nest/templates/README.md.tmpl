@@ -55,7 +55,7 @@ Envs: `.env` (dev), `.env.staging`, `.env.production`. Use `pnpm start:stage` to
 
 - **Never `process.env.FOO` directly.** Go through `configService.get('namespace.key')`. Env is Joi-validated at boot; malformed env fails fast.
 - **All responses go through `ResponseInterceptor`** (success → `{ data, timestamp }`) and `AllExceptionsFilter` (error → `{ error: { code, message, details?, timestamp, path } }`). Don't hand-roll response shapes.
-- **4-space indentation.**
+- **Tab indentation (width 4)** — enforced by `.editorconfig`; YAML files use 2 spaces (YAML forbids tabs).
 - **Controller routes + service methods** get a brief comment on what they do. Non-obvious logic gets an inline comment with the *why*.
 - **CORS** defaults to `*`. Lock down via `CORS_ORIGINS` (comma-separated) when you know the consumer domains.
 

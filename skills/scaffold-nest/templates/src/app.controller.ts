@@ -3,11 +3,11 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-    constructor(private readonly appService: AppService) {}
+	constructor(private readonly appService: AppService) {}
 
-    /** Root ping. Returns the app name + version from package.json. */
-    @Get()
-    info(): { name: string; version: string } {
-        return this.appService.info();
-    }
+	/** Root ping. Returns the app name + version from package.json. */
+	@Get()
+	info(): { name: string; version: string } {
+		return this.appService.info();
+	}
 }

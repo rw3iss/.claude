@@ -1,16 +1,16 @@
 {
-    "$schema": "https://json.schemastore.org/nest-cli",
-    "collection": "@nestjs/schematics",
-    "sourceRoot": "src",
-    "compilerOptions": {
-        "deleteOutDir": true,
-        "tsConfigPath": "config/tsconfig.build.json",
-        "builder": {
-            "type": "swc",
-            "options": {
-                "swcrcPath": "config/.swcrc"
-            }
-        },
-        "typeCheck": true
-    }
+	"$schema": "https://json.schemastore.org/nest-cli",
+	"collection": "@nestjs/schematics",
+	"sourceRoot": "src",
+	"compilerOptions": {
+		"deleteOutDir": true,
+		"tsConfigPath": "config/tsconfig.build.json",
+		"builder": {
+			"type": "swc",
+			"options": {
+				"swcrcPath": "config/.swcrc"
+			}
+		},
+		"typeCheck": true
+	}
 }

@@ -2,5 +2,5 @@
 // Polyfills any globals we rely on that might be missing in older Node envs.
 
 if (typeof globalThis.structuredClone === 'undefined') {
-    globalThis.structuredClone = (val) => JSON.parse(JSON.stringify(val));
+	globalThis.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 }

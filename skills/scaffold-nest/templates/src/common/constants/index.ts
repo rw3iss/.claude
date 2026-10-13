@@ -3,14 +3,14 @@
 
 /** Standard error codes used by AllExceptionsFilter. */
 export const ErrorCode = {
-    InternalError: 'INTERNAL_ERROR',
-    BadRequest: 'BAD_REQUEST',
-    Unauthorized: 'UNAUTHORIZED',
-    Forbidden: 'FORBIDDEN',
-    NotFound: 'NOT_FOUND',
-    Conflict: 'CONFLICT',
-    ValidationError: 'VALIDATION_ERROR',
-    RateLimited: 'RATE_LIMITED',
+	InternalError: 'INTERNAL_ERROR',
+	BadRequest: 'BAD_REQUEST',
+	Unauthorized: 'UNAUTHORIZED',
+	Forbidden: 'FORBIDDEN',
+	NotFound: 'NOT_FOUND',
+	Conflict: 'CONFLICT',
+	ValidationError: 'VALIDATION_ERROR',
+	RateLimited: 'RATE_LIMITED',
 } as const;
 
 export type ErrorCodeKey = keyof typeof ErrorCode;

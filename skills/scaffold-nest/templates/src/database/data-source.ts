@@ -11,14 +11,14 @@ import { resolve } from 'path';
 dotenv.config({ path: resolve(__dirname, '../../.env') });
 
 export default new DataSource({
-    type: 'postgres',
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT ?? '5432', 10),
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    // Glob both .ts (dev) and .js (after build) so the same config works pre- and post-compile.
-    entities: [resolve(__dirname, '../**/*.entity.{ts,js}')],
-    migrations: [resolve(__dirname, 'migrations/*.{ts,js}')],
-    migrationsTableName: 'migrations',
+	type: 'postgres',
+	host: process.env.DB_HOST,
+	port: parseInt(process.env.DB_PORT ?? '5432', 10),
+	username: process.env.DB_USER,
+	password: process.env.DB_PASSWORD,
+	database: process.env.DB_NAME,
+	// Glob both .ts (dev) and .js (after build) so the same config works pre- and post-compile.
+	entities: [resolve(__dirname, '../**/*.entity.{ts,js}')],
+	migrations: [resolve(__dirname, 'migrations/*.{ts,js}')],
+	migrationsTableName: 'migrations',
 });

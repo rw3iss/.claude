@@ -9,8 +9,8 @@ import { HealthModule } from './health/health.module';
 // Root module. Feature modules go under src/modules/ and are imported here
 // (keep this import list flat — no transitive module graphs).
 @Module({
-    imports: [ConfigModule, DatabaseModule, CacheModule, HealthModule],
-    controllers: [AppController],
-    providers: [AppService],
+	imports: [ConfigModule, DatabaseModule, CacheModule, HealthModule],
+	controllers: [AppController],
+	providers: [AppService],
 })
 export class AppModule {}

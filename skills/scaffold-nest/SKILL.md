@@ -64,6 +64,7 @@ mkdir -p "$TARGET"
 cp -r "$TEMPLATE"/. "$TARGET"/
 cd "$TARGET"
 mv gitignore .gitignore
+mv editorconfig .editorconfig
 mv config/dockerignore .dockerignore
 mv env.example .env.example
 cp .env.example .env   # so pnpm dev works out of the box against docker services
@@ -76,6 +77,7 @@ done
 
 Rename notes:
 - `gitignore` → `.gitignore` (at project root).
+- `editorconfig` → `.editorconfig` (at project root).
 - `config/dockerignore` → `.dockerignore` (at **project root** — Docker build context requires it there; noted in README).
 - `env.example` → `.env.example` (at project root).
 - `.env` is a copy of `.env.example` so first `pnpm dev` works against the default docker services.
@@ -187,6 +189,7 @@ Summarize:
 ├── .env.staging                             # scaffolded empty — user fills in
 ├── .env.production                          # scaffolded empty
 ├── .gitignore
+├── .editorconfig                            # tab indentation, width 4 (YAML: 2 spaces)
 ├── .dockerignore
 ├── Makefile                                 # native + docker modes, make help
 ├── testtools.config.json                    # @vendidit/test-tools project name
@@ -196,9 +199,9 @@ Summarize:
 
 **Rules embodied:**
 
-1. **4-space indentation** throughout (`.prettierrc`/`.editorconfig` set tab width = 4; all source files written with 4-space tabs).
+1. **Indentation = tabs (width 4)** — same rule as `scaffold-preact`. All generated code, configs (JSON, .swcrc) and templates use tab indentation, enforced project-wide by `.editorconfig` (`indent_style = tab`, `tab_width = 4`). Only exception: YAML (`docker-compose*.yml`) uses 2 spaces, because YAML forbids tabs. Any code you write or format for this scaffold must use tabs, not spaces.
 2. **SWC builder** via nest-cli.json's SWC option + `config/.swcrc`. Fast compilation, preserves decorator metadata.
-3. **Configs in `config/`** — scripts invoke with `nest ... -c config/nest-cli.json`, `tsc -p config/tsconfig.json`, `oxlint --config config/oxlint.json`. Exceptions (required at project root): `.env`, `.gitignore`, `.dockerignore`, `Makefile`, `testtools.config.json`, `package.json`.
+3. **Configs in `config/`** — scripts invoke with `nest ... -c config/nest-cli.json`, `tsc -p config/tsconfig.json`, `oxlint --config config/oxlint.json`. Exceptions (required at project root): `.env`, `.gitignore`, `.editorconfig`, `.dockerignore`, `Makefile`, `testtools.config.json`, `package.json`.
 4. **CORS** — enabled with origin `'*'` (all domains) in `main.ts`. Override via `CORS_ORIGINS` env (comma-separated).
 5. **Global exception filter** `AllExceptionsFilter` — standardizes error shape to `{ error: { code, message, details?, timestamp, path } }`, logs everything via `Logger`. Add domain-specific filters later, but they should inherit this shape.
 6. **Global response interceptor** `ResponseInterceptor` — wraps success responses as `{ data: T, timestamp: ISO }`. Consistent contract for every endpoint.

@@ -17,17 +17,17 @@ import redisConfig from './loaders/redis.config';
  */
 @Global()
 @Module({
-    imports: [
-        NestConfigModule.forRoot({
-            isGlobal: true,
-            cache: true,
-            load: [appConfig, databaseConfig, redisConfig],
-            validationSchema: envValidationSchema,
-            validationOptions: {
-                allowUnknown: true,
-                abortEarly: false,
-            },
-        }),
-    ],
+	imports: [
+		NestConfigModule.forRoot({
+			isGlobal: true,
+			cache: true,
+			load: [appConfig, databaseConfig, redisConfig],
+			validationSchema: envValidationSchema,
+			validationOptions: {
+				allowUnknown: true,
+				abortEarly: false,
+			},
+		}),
+	],
 })
 export class ConfigModule {}

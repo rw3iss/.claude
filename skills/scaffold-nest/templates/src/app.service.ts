@@ -7,8 +7,8 @@ const pkg: { name: string; version: string } = require('../package.json');
 
 @Injectable()
 export class AppService {
-    /** Returns metadata for the root endpoint. */
-    info(): { name: string; version: string } {
-        return { name: pkg.name, version: pkg.version };
-    }
+	/** Returns metadata for the root endpoint. */
+	info(): { name: string; version: string } {
+		return { name: pkg.name, version: pkg.version };
+	}
 }
