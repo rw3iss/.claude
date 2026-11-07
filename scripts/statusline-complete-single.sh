@@ -9,7 +9,8 @@ set -f  # disable globbing
 SHOW_GIT=true           # git branch, dirty status, ahead/behind
 SHOW_TOKENS=true        # token usage bar
 SHOW_THINKING=false     # extended thinking indicator
-SHOW_ORG=true           # organization name (takes the middle slot when thinking is off)
+SHOW_ORG=false          # organization name (takes the middle slot when thinking is off)
+SHOW_FAST_MODE=true     # ⚡ after the effort label when fast mode is on
 SHOW_COST=false         # session API cost (wide/full tiers only)
 SHOW_RATE_LIMITS=true   # 5h / 7d rate limit bars
 SHOW_EXTRA_USAGE=false  # extra/overage credits bar ($used/$limit)
@@ -259,6 +260,7 @@ model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 cwd=$(echo "$input"        | jq -r '.cwd // empty')
 cost_usd=$(echo "$input"   | jq -r '.cost.total_cost_usd // empty')
 effort_level=$(echo "$input" | jq -r '.effort.level // empty')
+fast_mode=$(echo "$input"    | jq -r '.fast_mode // false')
 
 size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 [ "$size" -eq 0 ] 2>/dev/null && size=200000
@@ -345,40 +347,13 @@ if [ -n "$effort_level" ]; then
         max)    effort_color="$red"    ;;
         *)      effort_color="$cyan"   ;;
     esac
-    if [ "$width_tier" = "narrow" ]; then
-        out+="${sep}${effort_color}⚡${effort_level}${reset}"
-    else
-        out+="${sep}${effort_color}⚡ ${effort_level}${reset}"
-    fi
+    out+="${sep}${effort_color}${effort_level}${reset}"
 fi
 
-# Git branch + dirty + ahead/behind
-if $SHOW_GIT && [ -n "$cwd" ]; then
-    git_info=$(get_git_info "$cwd")
-    if [ -n "$git_info" ]; then
-        IFS=$'\t' read -r g_branch g_dirty g_ahead g_behind <<< "$git_info"
-
-        # Progressively tighten branch truncation
-        local_max="$BRANCH_MAX_LEN"
-        [ "$width_tier" = "wide"   ] && local_max=24
-        [ "$width_tier" = "split"  ] && local_max=18
-        [ "$width_tier" = "narrow" ] && local_max=12
-        g_branch_display=$(truncate_str "$g_branch" "$local_max")
-
-        out+="${sep}${dim}⎇${reset} ${magenta}${g_branch_display}${reset}"
-
-        if [ "$g_dirty" = "dirty" ]; then
-            out+=" ${red}✗${reset}"
-        else
-            out+=" ${green}✔${reset}"
-        fi
-
-        # Ahead/behind: shown in all tiers except narrow (only if non-zero)
-        if [ "$width_tier" != "narrow" ]; then
-            [ "${g_ahead:-0}"  -gt 0 ] && out+=" ${green}↑${g_ahead}${reset}"
-            [ "${g_behind:-0}" -gt 0 ] && out+=" ${orange}↓${g_behind}${reset}"
-        fi
-    fi
+# Fast mode — ⚡ after the effort label (own slot when effort is absent)
+if $SHOW_FAST_MODE && [ "$fast_mode" = "true" ]; then
+    [ -n "$effort_level" ] && out+=" " || out+="${sep}"
+    out+="${yellow}⚡${reset}"
 fi
 
 # Token bar
@@ -506,10 +481,42 @@ if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
     fi
 fi
 
-# CWD — full path with ~ abbreviation, appended at end of status line
+# CWD — full path with ~ abbreviation, appended at end of status line,
+# followed by "(branch ✔ ↑1 ↓2)" when inside a git repo.
 if [ -n "$cwd" ]; then
-    display_cwd="${cwd/#$HOME/~}"
+    display_cwd="$cwd"
+    [[ "$cwd" == "$HOME"* ]] && display_cwd="~${cwd#"$HOME"}"
     out+="${sep}${dim}${display_cwd}${reset}"
+fi
+
+# Git branch + dirty + ahead/behind, in parentheses after the CWD
+if $SHOW_GIT && [ -n "$cwd" ]; then
+    git_info=$(get_git_info "$cwd")
+    if [ -n "$git_info" ]; then
+        IFS=$'\t' read -r g_branch g_dirty g_ahead g_behind <<< "$git_info"
+
+        # Progressively tighten branch truncation
+        local_max="$BRANCH_MAX_LEN"
+        [ "$width_tier" = "wide"   ] && local_max=24
+        [ "$width_tier" = "split"  ] && local_max=18
+        [ "$width_tier" = "narrow" ] && local_max=12
+        g_branch_display=$(truncate_str "$g_branch" "$local_max")
+
+        out+=" ${dim}(${reset}${magenta}${g_branch_display}${reset}"
+
+        if [ "$g_dirty" = "dirty" ]; then
+            out+=" ${red}✗${reset}"
+        else
+            out+=" ${green}✔${reset}"
+        fi
+
+        # Ahead/behind: shown in all tiers except narrow (only if non-zero)
+        if [ "$width_tier" != "narrow" ]; then
+            [ "${g_ahead:-0}"  -gt 0 ] && out+=" ${green}↑${g_ahead}${reset}"
+            [ "${g_behind:-0}" -gt 0 ] && out+=" ${orange}↓${g_behind}${reset}"
+        fi
+        out+="${dim})${reset}"
+    fi
 fi
 
 printf "%b" "$out"

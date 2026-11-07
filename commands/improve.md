@@ -140,8 +140,31 @@ the proposed refactor, the files affected, and the risk level**
 
 ### 5. Write the audit document
 
-Create `docs/improvement-audit-YYYY-MM-DD.md` with the following
-sections. Use today's date from the environment, not a guess.
+All audit files live under `./docs/audits/` (create the folders
+when they are missing). The folder tells the audit's status:
+
+| Folder | Status |
+|---|---|
+| `docs/audits/` | New: written, no work started |
+| `docs/audits/in-progress/` | Work started, not every item done |
+| `docs/audits/completed/` | Every item done (or closed with a reason) |
+
+Create the new audit directly in `docs/audits/`:
+`docs/audits/improvement-audit-YYYY-MM-DD.md`. If the audit is split
+by area, put the area files next to it
+(`docs/audits/improvement-audit-YYYY-MM-DD-<area>.md`); they move
+with the main file. Use today's date from the environment, not a
+guess. If the project has older audits in other places (for example
+`docs/improvement-audit-*.md` or `docs/audit/`), leave them where
+they are unless the user asks to move them.
+
+Every finding and every phase gets a status: `pending`,
+`in progress`, `applied` / `done`, `skipped` (with the reason),
+`reverted` (with the build failure), or `blocked` (name the
+blocker). Add a status table at the top of the summary (counts per
+phase and per status) and keep it in step with the items.
+
+The audit document has the following sections:
 
 ```
 # Improvement Audit — YYYY-MM-DD
@@ -149,7 +172,9 @@ sections. Use today's date from the environment, not a guess.
 ## 1. Summary
 - Project: <name>
 - Working directory: <absolute path>
+- Status: new | in progress | completed (YYYY-MM-DD)
 - Total findings: <count> (UI: N, styling: N, architecture: N)
+- Status table: per phase (A / B / C) — pending, done, skipped, blocked
 
 ## 2. UI & UX improvements
   [per finding: title, location, problem, proposed fix, risk]
@@ -164,9 +189,45 @@ sections. Use today's date from the environment, not a guess.
   - Phase A (low risk, apply automatically): <bulleted list>
   - Phase B (medium risk, apply after user approval): <bulleted list>
   - Phase C (high risk or architectural, plan separately): <bulleted list>
+
+## 6. Progress log
+  [dated lines: what was applied, verified, reverted or blocked]
 ```
 
+### 5a. Audit lifecycle (folders and status)
+
+Follow this every time work starts on an audit, whether the user
+asks for it directly or through `/implement` (or any other skill
+that works through the audit):
+
+1. **Start of work → `in-progress/`.** Before the first change,
+   move the audit file (and its area files) from `docs/audits/` to
+   `docs/audits/in-progress/`. Use `git mv` when the file is
+   tracked. Set "Status: in progress" in the summary. Grep the repo
+   for the old path and update every reference (docs, plans, other
+   audits, code comments) in the same change.
+2. **Keep it current while working.** Each time a finding, task or
+   phase completes, update the audit file at once — not at the end:
+   set the item's status, add the commit hash or the verification
+   result when there is one, update the status table, and add a
+   dated line to the progress log. The file must always show the
+   true state, so an interrupted session can resume from it.
+3. **Every item done → `completed/`.** When no item is left
+   `pending` or `in progress` (each one is done, skipped with a
+   reason, or blocked with the blocker named), set
+   "Status: completed (YYYY-MM-DD)", add closing notes (what was
+   not done and why, what to watch), and move the file (and its
+   area files) to `docs/audits/completed/`. Update every reference
+   to the old path again.
+4. **Never skip a stage.** An audit is in exactly one folder. Do not
+   move it to `completed/` while items are still open; do not leave
+   it in `docs/audits/` once work has started.
+
 ### 6. Apply Phase A automatically (low risk)
+
+Phase A is the start of work: move the audit to
+`docs/audits/in-progress/` first (§5a), then update each item's
+status in the file as it is applied.
 
 These are safe, low-blast-radius improvements that can be applied
 without explicit per-item confirmation:
@@ -208,7 +269,9 @@ that multiple callers depend on. Show the user:
 When the user approves an item, apply the change and re-verify
 builds the same way Phase A does. Update the audit document to
 mark the item as applied, and note any items that failed the
-build (reverted).
+build (reverted). Follow §5a: the file is in
+`docs/audits/in-progress/` while this runs, and each item's status
+is updated as it completes.
 
 ### 8. Phase C — plan only
 
@@ -217,6 +280,8 @@ changes, anything that touches >10 files or changes public APIs)
 should **not** be applied by this command. Instead:
 
 - Leave them documented in the audit under "Phase C — planned".
+  If the user does not want them, mark them `skipped` with the
+  reason so the audit can still reach `completed/`.
 - Tell the user these deserve a dedicated planning session and
   recommend running `/implement` or the `superpowers:writing-plans`
   skill to turn them into a proper implementation plan.
@@ -323,7 +388,10 @@ Use judgment.
 
 ## Output expectations
 
-- An audit document at `docs/improvement-audit-YYYY-MM-DD.md`
+- An audit document at `docs/audits/improvement-audit-YYYY-MM-DD.md`,
+  moved to `docs/audits/in-progress/` when work starts and to
+  `docs/audits/completed/` when every item is closed (§5a), with
+  item statuses kept current throughout
   listing every finding, its severity, its location, and the
   proposed fix.
 - Phase A improvements applied to the working tree, with the
@@ -340,7 +408,8 @@ Use judgment.
   - How many were applied after approval.
   - How many are deferred to Phase C planning.
   - Which documentation files were updated.
-  - Path to the audit document.
+  - Path to the audit document (its current folder: `in-progress/`
+    or `completed/`).
 
 ## Focus areas (in priority order)
 

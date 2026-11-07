@@ -1,0 +1,29 @@
+@use 'variables' as *;
+
+// Breakpoint mixins — mobile-first. Example:
+//   .card { padding: 1rem; @include tablet { padding: 2rem; } }
+
+@mixin mobile {
+	@media (max-width: #{$bp-tablet - 1px}) { @content; }
+}
+
+@mixin tablet {
+	@media (min-width: $bp-tablet) and (max-width: #{$bp-desktop - 1px}) { @content; }
+}
+
+@mixin tablet-up {
+	@media (min-width: $bp-tablet) { @content; }
+}
+
+@mixin desktop {
+	@media (min-width: $bp-desktop) { @content; }
+}
+
+@mixin wide {
+	@media (min-width: $bp-wide) { @content; }
+}
+
+// Aspect-ratio helper for older browsers (modern CSS: use `aspect-ratio` directly).
+@mixin aspect($w, $h) {
+	aspect-ratio: #{$w} / #{$h};
+}

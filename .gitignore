@@ -19,12 +19,29 @@
 !/skills/
 
 # 4. Inside skills/, default-deny again, then re-include the chosen skills.
-/skills/*
-!/skills/api-sync/
-!/skills/mvp-analysis/
-!/skills/scaffold-nest/
-!/skills/scaffold-preact/
-!/skills/system-fix/
+# /skills/*
+# !/skills/api-sync/
+# !/skills/mvp-analysis/
+# !/skills/scaffold-nest/
+# !/skills/scaffold-preact/
+# !/skills/system-fix/
+# !/skills/broken-link-crawler/
+# !/skills/build/
+# !/skills/codebase-visualizer/
+# !/skills/design/
+# !/skills/design-research/
+# !/skills/md-to-html/
+# !/skills/movie-finder/
+# !/skills/FIX-FORMAT.md
+
+# ignores these:
+!/skills/
+/skills/context7-mcp
+/skills/find-skills
+/skills/graphify
+/skills/impeccable
+/skills/ven-skills
+/skills/*.zip
 
 # 5. Never commit node_modules from anywhere (incl. inside tracked skills).
 node_modules/

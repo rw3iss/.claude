@@ -1,0 +1,41 @@
+// Theme overrides — swap at runtime by setting
+//   document.documentElement.dataset.theme = 'dark'   (or 'light')
+//
+// The default `:root` values in _variables.scss are the light theme; this file
+// overrides them when `[data-theme='dark']` is set. Add more themes as
+// `[data-theme='some-name']` blocks below.
+
+[data-theme='dark'] {
+	--color-bg: #0b0b12;
+	--color-surface: #15151f;
+	--color-surface-2: #1f1f2d;
+	--color-text: #e9e9f4;
+	--color-text-muted: #9494a7;
+	--color-border: #2a2a3a;
+	--color-primary: #818cf8;
+	--color-primary-fg: #0b0b12;
+	--color-accent: #a78bfa;
+	--color-danger: #f87171;
+	--color-success: #4ade80;
+
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+// Respect OS-level preference as a fallback if no explicit theme is set.
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) {
+		--color-bg: #0b0b12;
+		--color-surface: #15151f;
+		--color-surface-2: #1f1f2d;
+		--color-text: #e9e9f4;
+		--color-text-muted: #9494a7;
+		--color-border: #2a2a3a;
+		--color-primary: #818cf8;
+		--color-primary-fg: #0b0b12;
+		--color-accent: #a78bfa;
+		--color-danger: #f87171;
+		--color-success: #4ade80;
+	}
+}

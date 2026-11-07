@@ -1,0 +1,52 @@
+# COMPONENT_INDEX.md — __APP_NAME__
+
+The **reuse manifest** for this app. `build` reads this file before building
+any new page or feature, and updates it after. Its purpose is DRY: new work must
+reuse, adapt, or extend what already exists here before anything new is created.
+
+**How to use it (every build):**
+1. Analyze the request — goal/objective, then the granular pieces/functionality.
+2. Scan the tables below for pages, components, utilities, or styles that match or could
+   be adapted (layout pieces included).
+3. Reuse or extend those. Create a new entry **only** when the need is genuinely unique.
+4. Add a row here for every new page, shared component, utility/hook, or SCSS mixin/class.
+
+**Placement (where new code lives — keep pages and components separate):**
+- **Pages** (route/screen views) → `src/pages/<PageName>/` → record in the **Pages** table.
+- **Feature / UI components** → `src/components/<feature-or-component>/` → **Components** table.
+- **Common / primitive components** (Button, Input, Modal, … reused everywhere) →
+  `src/components/common/<Component>/` → **Components** table, marked `common`.
+
+> Seeded empty. Rows accumulate as the app grows.
+
+## Pages
+
+| Page | Path | Purpose | Notes |
+|---|---|---|---|
+| _(none yet)_ | `src/pages/<PageName>/` | | |
+
+## Components
+
+Mark common primitives with `common` in the Kind column; they live in
+`src/components/common/<Component>/`. Feature/UI components live in
+`src/components/<feature-or-component>/`.
+
+| Component | Kind | Path | Purpose | Reuse for |
+|---|---|---|---|---|
+| _(none yet)_ | feature \| common | | | |
+
+## Shared utilities & hooks
+
+| Name | Path | Purpose | Reuse for |
+|---|---|---|---|
+| _(none yet)_ | | | |
+
+## Shared SCSS (mixins · classes · tokens)
+
+| Name | Path | Purpose | Reuse for |
+|---|---|---|---|
+| `mobile` / `tablet` / `tablet-up` / `desktop` / `wide` | `styles/_responsive.scss` | breakpoint mixins (mobile-first) | media queries |
+| `fluid()` / `visually-hidden` / `respect-reduced-motion` | `styles/_mixins.scss` | fluid clamp() sizing + a11y helpers | responsive type, sr-only, motion |
+| `--color-*` / `--space-*` / `--radius-*` / `--shadow-*` / `--ease-*` | `styles/_variables.scss` (`:root`) | design tokens (CSS custom properties) | all components |
+| `--font-body` / `--font-mono` | `styles/_variables.scss` | font stacks | all typography |
+| `[data-theme='dark']` overrides | `styles/_themes.scss` | runtime theme swap | theming |

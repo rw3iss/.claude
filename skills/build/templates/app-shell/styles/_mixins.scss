@@ -1,0 +1,32 @@
+@use 'sass:math';
+@use 'variables' as *;
+@use 'responsive' as *;
+@forward 'responsive';
+
+// fluid(min, max, [minVw, maxVw]) — type-safe clamp() for responsive sizing.
+// Example: font-size: fluid(16px, 24px);
+@function fluid($min, $max, $min-vw: $bp-mobile, $max-vw: $bp-desktop) {
+	$slope: math.div($max - $min, $max-vw - $min-vw);
+	$base: $min - $slope * $min-vw;
+	@return clamp(#{$min}, #{$base} + #{$slope * 100}vw, #{$max});
+}
+
+// Visually hide but keep available to screen readers.
+@mixin visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+// Respects the user's reduced-motion preference for the block.
+@mixin respect-reduced-motion {
+	@media (prefers-reduced-motion: reduce) {
+		@content;
+	}
+}

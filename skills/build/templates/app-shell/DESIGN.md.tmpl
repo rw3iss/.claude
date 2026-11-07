@@ -1,0 +1,63 @@
+# DESIGN.md — __APP_NAME__
+
+Design rules for this app. **Every `build` request reads this file first.**
+Keep it the single source of truth for how the product looks and feels. When a
+build establishes a new design decision, record it here so later builds stay
+consistent.
+
+> This file was seeded as a starter. Fill each section in as the design language
+> is established (the first feature build will do this). Delete the _(todo)_
+> markers as you go.
+
+## Aesthetic
+
+_(todo: 2–4 sentences — the overall personality. e.g. "calm neo-technical;
+business-casual; dense but uncluttered; one accent, two neutrals.")_
+
+## Color
+
+Tokens are **CSS custom properties** declared in `:root` in `styles/_variables.scss`
+(light/default) and overridden per theme in `styles/_themes.scss`. Reference them
+in component SCSS as `var(--color-*)`. Document intent here; the SCSS holds values.
+
+| Token | Role | _(todo: value)_ |
+|---|---|---|
+| `--color-bg` | page background | |
+| `--color-surface` / `--color-surface-2` | raised surfaces | |
+| `--color-primary` / `--color-primary-fg` | single accent + its foreground | |
+| `--color-text` / `--color-text-muted` | text ramp | |
+| `--color-border` | hairline borders | |
+
+Rule: **one accent.** Semantic colors (`--color-danger` / `--color-success`) only when something is genuinely that state.
+
+## Typography
+
+Fonts are CSS custom properties (`--font-body`, `--font-mono`, plus any you add
+such as `--font-heading`) in `styles/_variables.scss`. For web fonts, add a single
+`@import url(...)` (or `@font-face`) at the top of `_variables.scss`.
+
+| Token | Used for | _(todo: stack)_ |
+|---|---|---|
+| `--font-heading` | display / headings (add if needed) | |
+| `--font-body` | body copy | |
+| `--font-mono` | labels / numeric / code | |
+
+Rule: components use `font-family: var(--font-*)` — **never** a raw `font-family` string.
+
+## Spacing & radii
+
+Use the `--space-*` and `--radius-*` scales (CSS custom properties in
+`_variables.scss`). Breakpoints are Sass `$bp-*` vars in `_variables.scss`, used by
+the responsive mixins. Don't introduce ad-hoc pixel values; extend the scale instead.
+
+## Component design
+
+- Prefer small, single-purpose components; break sections into discrete, reusable pieces.
+- One `Component.scss` per component, imported once at the top of the component, with real class names (no CSS modules).
+- Mobile-first: base styles target small screens; layer up with the `@include tablet` / `@include desktop` mixins from `styles/_responsive.scss`. Wrap animations in `@include respect-reduced-motion`.
+- Reuse before creating — consult [`COMPONENT_INDEX.md`](./COMPONENT_INDEX.md) first.
+
+## Motion
+
+Motion tokens (`--ease-out`, `--ease-in-out`, `--dur-fast/med/slow`) live in
+`styles/_variables.scss`. _(todo: note any motion personality + reduced-motion policy.)_

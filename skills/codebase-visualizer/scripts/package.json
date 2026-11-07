@@ -1,0 +1,11 @@
+{
+  "name": "codebase-visualizer",
+  "version": "1.0.0",
+  "description": "Generate PNG class-relationship diagrams from TypeScript/JavaScript codebases",
+  "main": "visualize.js",
+  "dependencies": {
+    "ts-morph": "^24.0.0",
+    "dagre": "^0.8.5",
+    "canvas": "^3.1.0"
+  }
+}

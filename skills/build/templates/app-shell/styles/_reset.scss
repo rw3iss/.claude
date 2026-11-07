@@ -1,0 +1,43 @@
+// Minimal modern CSS reset.
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+	margin: 0;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd {
+	margin: 0;
+}
+
+ul[role='list'], ol[role='list'] {
+	list-style: none;
+	padding: 0;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+img, picture, video, canvas, svg {
+	display: block;
+	max-width: 100%;
+}
+
+input, button, textarea, select {
+	font: inherit;
+	color: inherit;
+}
+
+button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}

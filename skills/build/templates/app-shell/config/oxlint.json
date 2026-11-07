@@ -1,0 +1,18 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn",
+		"perf": "warn",
+		"style": "off"
+	},
+	"ignorePatterns": ["dist", "node_modules", "public"],
+	"env": {
+		"browser": true,
+		"es2023": true
+	},
+	"rules": {
+		"react/react-in-jsx-scope": "off",
+		"react/jsx-key": "off"
+	}
+}

@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Dispatcher for the designer skill. Runs tsx from the skill's own
+# node_modules so the command works from any CWD.
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+TSX="$HERE/node_modules/.bin/tsx"
+
+if [[ ! -x "$TSX" ]]; then
+  echo "error: tsx not installed at $TSX" >&2
+  echo "run the installer again: ./install.sh (or ./install.sh --local <pkg-path>)" >&2
+  exit 1
+fi
+
+cmd="${1:-}"
+[[ $# -gt 0 ]] && shift
+
+case "$cmd" in
+  setup)
+    exec "$TSX" "$HERE/scripts/setup_check.ts" "$@"
+    ;;
+  generate)
+    exec "$TSX" "$HERE/scripts/mj_bot.ts" generate "$@"
+    ;;
+  upscale)
+    exec "$TSX" "$HERE/scripts/upscale.ts" "$@"
+    ;;
+  prepare-prompt)
+    exec "$TSX" "$HERE/scripts/prepare_prompt.ts" "$@"
+    ;;
+  process-raw)
+    exec "$TSX" "$HERE/scripts/process_raw.ts" "$@"
+    ;;
+  ""|-h|--help)
+    cat <<'EOF'
+Usage: designer <command> [args]
+
+Commands:
+  setup [--skip-discord]   Discord + Midjourney setup (full).
+                           --skip-discord: verify tools only — no Discord
+                           credentials needed. Use this if you only want
+                           build (image → Preact app) without MJ.
+  generate '<json>'        Trigger /imagine, listen, download, split grid
+  upscale '<json>'         Click U1..U4 on a stored message for hi-res
+  prepare-prompt '<json>'  Assemble prompt from brief + DESIGN.md + flags
+  process-raw '<json>'     Manual-mode: scan raw/*.png and split grids
+
+JSON arg shapes are documented in each script. Example:
+  designer setup
+  designer setup --skip-discord
+  designer generate '{"prompt":"<text>","request":"<name>","projectCwd":"<cwd>"}'
+EOF
+    [[ "$cmd" == "" ]] && exit 1 || exit 0
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    echo "Run 'designer --help' for usage." >&2
+    exit 2
+    ;;
+esac
