@@ -8,6 +8,7 @@ set -f  # disable globbing
 # ===== Config =====
 SHOW_GIT=true           # git branch, dirty status, ahead/behind
 SHOW_TOKENS=true        # token usage bar
+SHOW_AUTOCOMPACT=true   # auto-compact threshold after the token bar: "(600k)" or "(off)"
 SHOW_THINKING=false     # extended thinking indicator
 SHOW_ORG=false          # organization name (takes the middle slot when thinking is off)
 SHOW_FAST_MODE=true     # ⚡ after the effort label when fast mode is on
@@ -281,6 +282,97 @@ if [ -f "$settings_path" ]; then
     [ "$thinking_val" = "true" ] && thinking_on=true
 fi
 
+# ===== Auto-compact threshold =====
+# The statusline JSON has no auto-compact field, so resolve it the way Claude Code
+# does: env vars > --autocompact launch flag > modelSettings[model] > autoCompactWindow
+# > model default. Settings files are checked highest scope first.
+model_id=$(echo "$input" | jq -r '.model.id // empty')
+
+# Parse "600000" / "600k" / "1M" / bare 100–1000 (thousands) → tokens
+parse_window() {
+    local v="${1,,}"
+    case "$v" in
+        auto|"") return 1 ;;
+        *m) awk -v n="${v%m}" 'BEGIN{printf "%d", n*1000000}' ;;
+        *k) awk -v n="${v%k}" 'BEGIN{printf "%d", n*1000}' ;;
+        *[!0-9]*) return 1 ;;
+        *) [ "$v" -ge 100 ] && [ "$v" -le 1000 ] && [ "$2" = "cli" ] && echo $(( v * 1000 )) || echo "$v" ;;
+    esac
+}
+
+settings_files=()
+for _f in "$cwd/.claude/settings.local.json" "$cwd/.claude/settings.json" \
+          "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.local.json" \
+          "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"; do
+    [ -f "$_f" ] && settings_files+=("$_f")
+done
+unset _f
+
+# First non-null value of a jq path across settings scopes
+setting_value() {
+    local f v
+    for f in "${settings_files[@]}"; do
+        v=$(jq -r "$1 // empty" "$f" 2>/dev/null)
+        [ -n "$v" ] && echo "$v" && return 0
+    done
+    return 1
+}
+
+# --autocompact flag on the parent claude process (statusline runs as its child)
+claude_flag_window() {
+    local pid=$PPID args i
+    for i in 1 2 3; do
+        [ -r "/proc/$pid/cmdline" ] || return 1
+        mapfile -d '' args < "/proc/$pid/cmdline"
+        if [[ "$(basename "${args[0]}")" == claude* ]] || [[ "${args[1]}" == */claude ]]; then
+            for ((j=0; j<${#args[@]}; j++)); do
+                case "${args[j]}" in
+                    --autocompact=*) echo "${args[j]#*=}"; return 0 ;;
+                    --autocompact) echo "${args[j+1]}"; return 0 ;;
+                esac
+            done
+            return 1
+        fi
+        pid=$(awk '{print $4}' "/proc/$pid/stat" 2>/dev/null)
+    done
+    return 1
+}
+
+autocompact_label=""
+if $SHOW_AUTOCOMPACT; then
+    if [ "${DISABLE_COMPACT:-}" = "1" ] || [ "${DISABLE_AUTO_COMPACT:-}" = "1" ] \
+        || [ "$(setting_value '.autoCompactEnabled | tostring')" = "false" ]; then
+        autocompact_label="off"
+    else
+        ac_window=""
+        base_model="${model_id%%\[*}"
+        if [ -n "${CLAUDE_CODE_AUTO_COMPACT_WINDOW:-}" ]; then
+            ac_window=$(parse_window "$CLAUDE_CODE_AUTO_COMPACT_WINDOW")
+            [ -n "$ac_window" ] && [ "$ac_window" -lt 100000 ] && ac_window=100000
+            [ -n "$ac_window" ] && [ "$ac_window" -gt 1000000 ] && ac_window=1000000
+        fi
+        if [ -z "$ac_window" ]; then
+            _flag=$(claude_flag_window)
+            if [ "${_flag,,}" != "auto" ]; then
+                [ -n "$_flag" ] && ac_window=$(parse_window "$_flag" cli)
+                [ -z "$ac_window" ] && ac_window=$(parse_window "$(setting_value ".modelSettings[\"$model_id\"].autoCompactWindow // .modelSettings[\"$base_model\"].autoCompactWindow")")
+                [ -z "$ac_window" ] && ac_window=$(parse_window "$(setting_value '.autoCompactWindow')")
+            fi
+            unset _flag
+        fi
+        # Model default: native 1M windows compact at ~967k, others at the limit
+        if [ -z "$ac_window" ]; then
+            [ "$size" -ge 1000000 ] && ac_window=967000 || ac_window=$size
+        fi
+        [ "$ac_window" -gt "$size" ] && ac_window=$size
+        pct_override="${CLAUDE_AUTOCOMPACT_PCT_OVERRIDE:-}"
+        if [[ "$pct_override" =~ ^[0-9]+$ ]] && [ "$pct_override" -ge 1 ] && [ "$pct_override" -lt 100 ]; then
+            ac_window=$(( ac_window * pct_override / 100 ))
+        fi
+        autocompact_label=$(format_tokens "$ac_window")
+    fi
+fi
+
 # Organization name — read from the active config dir's .claude.json
 org_name=""
 if $SHOW_ORG; then
@@ -364,6 +456,7 @@ if $SHOW_TOKENS; then
     [ "$width_tier" = "narrow" ] && bar_w=4
     token_bar=$(build_bar "$pct_used" "$bar_w")
     out+="${sep}${token_bar} ${orange}${used_tokens}${dim}/${reset}${white}${total_tokens}${reset} ${dim}${pct_used}%${reset}"
+    [ -n "$autocompact_label" ] && out+=" ${dim}(${autocompact_label})${reset}"
 fi
 
 # Middle slot: Organization (preferred) or Thinking indicator.
@@ -392,6 +485,21 @@ fi
 if $SHOW_COST && [ -n "$cost_usd" ] && [ "$width_tier" = "wide" -o "$width_tier" = "full" ]; then
     cost_fmt=$(printf '%.2f' "$cost_usd" 2>/dev/null)
     [ -n "$cost_fmt" ] && out+="${sep}${dim}\$${cost_fmt}${reset}"
+fi
+
+# ===== Costline: run time + estimated weighted tokens (toggle: /costs on|off, or env CLAUDE_COSTLINE=1/0) =====
+costline_on=false
+if [ "${CLAUDE_COSTLINE:-}" = "1" ]; then costline_on=true
+elif [ "${CLAUDE_COSTLINE:-}" != "0" ] && [ -f "$HOME/.claude/costline.on" ]; then costline_on=true; fi
+cl_tp=$(echo "$input" | jq -r '.transcript_path // empty')
+cl_sid=$(echo "$input" | jq -r '.session_id // empty')
+[ -n "$cl_sid" ] && [ -f "$HOME/.claude/costline.d/$cl_sid" ] && costline_on=true
+[ -n "$cl_sid" ] && [ -f "$HOME/.claude/costline.d/$cl_sid.off" ] && costline_on=false
+if $costline_on; then
+    if [ -n "$cl_tp" ]; then
+        cl_txt=$(python3 "$HOME/.claude/scripts/costline.py" "$cl_tp" "$cl_sid" 2>/dev/null)
+        [ -n "$cl_txt" ] && out+="${sep}${amber}${cl_txt}${reset}"
+    fi
 fi
 
 # ===== Rate limits (API, cached 60s) =====
